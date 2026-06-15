@@ -1,24 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { FlatList, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import "./global.css";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+const properties = [
+	{ id: "1", name: "Modern Apartment", price: 250000 },
+	{ id: "2", name: "Cozy Cottage", price: 150000 },
+	{ id: "3", name: "Luxury Villa", price: 750000 },
+	{ id: "4", name: "Beachfront Condo", price: 500000 },
+];
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+	return (
+		<SafeAreaView>
+			<View>
+				<FlatList
+					data={properties}
+					keyExtractor={(item) => item.id}
+					renderItem={({ item }) => (
+						<View className=" p-4 border-b border-gray-200">
+							<Text>{item.name}</Text>
+							<Text>${item.price}</Text>
+						</View>
+					)}
+				/>
+			</View>
+		</SafeAreaView>
+	);
 }
