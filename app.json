@@ -40,7 +40,7 @@
           }
         }
       ],
-      // "@clerk/expo",
+      "@clerk/expo",
       "expo-secure-store"
     ],
     "experiments": {
