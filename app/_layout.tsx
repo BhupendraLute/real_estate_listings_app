@@ -1,5 +1,4 @@
-import { FlatList, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Slot } from "expo-router";
 import "./global.css";
 
 const properties = [
@@ -10,20 +9,5 @@ const properties = [
 ];
 
 export default function RootLayout() {
-	return (
-		<SafeAreaView>
-			<View>
-				<FlatList
-					data={properties}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => (
-						<View className=" p-4 border-b border-gray-200">
-							<Text>{item.name}</Text>
-							<Text>${item.price}</Text>
-						</View>
-					)}
-				/>
-			</View>
-		</SafeAreaView>
-	);
+	return <Slot />;
 }
