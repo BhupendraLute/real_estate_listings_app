@@ -1,4 +1,4 @@
-import { useAuth, useSignIn } from "@clerk/expo";
+import { useAuth, useSignUp } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,8 +11,9 @@ import {
 	View,
 } from "react-native";
 
-export default function SignInScreen() {
-	const { signIn, errors, fetchStatus } = useSignIn();
+export default function SignUpScreen() {
+	const { signUp, errors, fetchStatus } = useSignUp();
+	const { isSignedIn } = useAuth();
 
 	const router = useRouter();
 
@@ -24,51 +25,30 @@ export default function SignInScreen() {
 
 	const isLoading = fetchStatus === "fetching";
 
-	const onSignInPress = async () => {
-		const { error } = await signIn.password({
+	if(signUp.status === "complete" || isSignedIn) {
+		return null;
+	}
+
+	const onSignupPress = async () => {
+		const { error } = await signUp.password({
 			emailAddress: email,
 			password,
+			firstName,
+			lastName,
 		});
 
 		if (error) {
 			alert(error.message);
 		}
 
-		if (signIn.status === "complete") {
-			await signIn.finalize({
-				navigate: ({ session, decorateUrl }) => {
-					if (session?.currentTask) {
-						console.log(session?.currentTask);
-						return;
-					}
-					const url = decorateUrl("/");
-					router.replace(url as any);
-				},
-			});
-		} else if (signIn.status === "needs_second_factor") {
-			await signIn.mfa.sendPhoneCode();
-		} else if (signIn.status === "needs_client_trust") {
-			const emailCodeFactor = signIn.supportedSecondFactors.find(
-				(factor) => factor.strategy === "email_code",
-			);
-
-			if (emailCodeFactor) {
-				await signIn.mfa.sendEmailCode();
-			}
-		} else {
-			console.error("Sign-in attempt not complete: ", signIn);
-		}
+		if (!error) await signUp.verifications.sendEmailCode();
 	};
 
 	const onVerifyPress = async () => {
-		await signIn.mfa.verifyEmailCode({ code });
-		if (signIn.status === "complete") {
-			await signIn.finalize({
-				navigate: ({ session, decorateUrl }) => {
-					if (session?.currentTask) {
-						console.log(session?.currentTask);
-						return;
-					}
+		await signUp.verifications.verifyEmailCode({ code });
+		if (signUp.status === "complete") {
+			await signUp.finalize({
+				navigate: ({ decorateUrl }) => {
 					const url = decorateUrl("/");
 					router.replace(url as any);
 				},
@@ -76,7 +56,11 @@ export default function SignInScreen() {
 		}
 	};
 
-	if (signIn.status === "needs_client_trust") {
+	if (
+		signUp.status === "missing_requirements" &&
+		signUp.unverifiedFields.includes("email_address") &&
+		signUp.missingFields.length === 0
+	) {
 		return (
 			<View className="flex-1 justify-center px-6 py-12">
 				<Image
@@ -128,7 +112,7 @@ export default function SignInScreen() {
 				</View>
 				<View className="mb-4">
 					<TouchableOpacity
-						onPress={() => signIn.mfa.sendEmailCode()}
+						onPress={() => signUp.verifications.sendEmailCode()}
 						disabled={isLoading}
 						className="py-3"
 					>
@@ -154,11 +138,31 @@ export default function SignInScreen() {
 					resizeMode="contain"
 				/>
 				<Text className="text-3xl font-bold text-gray-800 mb-2">
-					Welcome Back!
+					Create Account
 				</Text>
 				<Text className="text-gray-500 mb-8">
-					Sign in to your account to continue
+					Find your dream home with PropyKribb. Sign up to get
+					started!
 				</Text>
+
+				<View className="flex-row gap-3 mb-4">
+					<TextInput
+						className="flex-1 border border-gray-300 rounded-xl px-4 py-3"
+						placeholder="First Name"
+						placeholderTextColor={"#9CA3AF"}
+						autoCapitalize="words"
+						value={firstName}
+						onChangeText={setFirstName}
+					/>
+					<TextInput
+						className="flex-1 border border-gray-300 rounded-xl px-4 py-3"
+						placeholder="Last Name"
+						placeholderTextColor={"#9CA3AF"}
+						autoCapitalize="words"
+						value={lastName}
+						onChangeText={setLastName}
+					/>
+				</View>
 				<View className="mb-4">
 					<TextInput
 						className="flex-1 border border-gray-300 rounded-xl px-4 py-3"
@@ -169,9 +173,9 @@ export default function SignInScreen() {
 						value={email}
 						onChangeText={setEmail}
 					/>
-					{errors.fields.identifier && (
+					{errors.fields.emailAddress && (
 						<Text className="text-red-500 mb-4">
-							{errors.fields.identifier.message}
+							{errors.fields.emailAddress.message}
 						</Text>
 					)}
 				</View>
@@ -192,7 +196,7 @@ export default function SignInScreen() {
 				</View>
 				<View className="mb-4">
 					<TouchableOpacity
-						onPress={onSignInPress}
+						onPress={onSignupPress}
 						disabled={isLoading}
 						className="w-full bg-blue-500 rounded-xl items-center py-3"
 					>
@@ -200,7 +204,7 @@ export default function SignInScreen() {
 							<ActivityIndicator color="white" />
 						) : (
 							<Text className="text-white font-bold text-base">
-								Sign In
+								Sign Up
 							</Text>
 						)}
 					</TouchableOpacity>
@@ -208,13 +212,13 @@ export default function SignInScreen() {
 
 				<View className="flex-row justify-center">
 					<Text className="text-gray-500">
-						Don't have an account?{" "}
+						Already have an account?{" "}
 					</Text>
 					<Link
-						href="/sign-up"
+						href="/sign-in"
 						className="text-blue-600 font-semibold"
 					>
-						Sign Up
+						Sign In
 					</Link>
 				</View>
 

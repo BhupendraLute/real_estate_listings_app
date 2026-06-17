@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "real_estate_listings_app",
-    "slug": "real_estate_listings_app",
+    "name": "PropyKribb",
+    "slug": "PropyKribb",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/propykribb.png",
     "scheme": "realestatelistingsapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -20,18 +20,18 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bhupendralute.real_estate_listings_app"
+      "package": "com.bhupendralute.propykribb"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/propykribb.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/propykribb.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
